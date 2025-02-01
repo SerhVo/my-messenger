@@ -16,7 +16,7 @@ import {
 import { getStorage } from "firebase/storage"; 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBaFcANMR9Ff0mowQlCpE0cMgv9rJj87oI",
+  apiKey:  import.meta.env.VITE_API_KEY,
   authDomain: "my-messenger-f0a59.firebaseapp.com",
   projectId: "my-messenger-f0a59",
   storageBucket: "my-messenger-f0a59.firebasestorage.app",

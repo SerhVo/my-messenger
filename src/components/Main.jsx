@@ -7,7 +7,7 @@ export default function Main() {
 
   return (
     <div className="flex flex-col items-center p-4">
-      <img src="./logo.png" alt="logo" className="w-20 h-20 p-2 object-fit" />
+      <img src="./img/logo.png" alt="logo" className="w-20 h-20 p-2 object-fit" />
       <h1 className="text-2xl font-bold">Chat App</h1>
 
       {user && (

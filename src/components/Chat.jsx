@@ -25,7 +25,9 @@ import debounce from "lodash.debounce";
 import { motion } from "framer-motion";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
-import { Picker } from "emoji-mart";
+import Picker from "@emoji-mart/react"; // Правильный импорт
+import { useUserAvatar } from "./RandomAvatar";
+import { useAuth } from "./AuthProvider";
 
 export default function Chat() {
   const [messages, dispatch] = useReducer((state, action) => {
@@ -43,9 +45,12 @@ export default function Chat() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
+  const user = useAuth();
 
   useEffect(() => {
-    Notification.requestPermission();
+    if ("Notification" in window) {
+      Notification.requestPermission();
+    }
     const q = query(messagesRef, orderBy("createdAt"), limit(msgLimit));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newMessages = snapshot.docs.map((doc) => ({
@@ -112,69 +117,65 @@ export default function Chat() {
     });
   };
 
+  // Получаем аватары заранее
+  const avatarsMap = useMemo(() => {
+    const map = {};
+    messages.forEach((msg) => {
+      map[msg.uid] = useUserAvatar(msg.uid, msg.photoURL);
+    });
+    return map;
+  }, [messages]);
+
   return (
     <div className="relative w-full max-w-md p-4 border rounded-md">
       <div className="absolute inset-0 bg-[url('/fon.png')] bg-contain bg-repeat opacity-10"></div>
       <div className="relative z-10">
         <div className="h-64 overflow-auto border-b">
           {loading && <p>Загрузка сообщений...</p>}
-          {messages.map(
-            (msg) =>
-              msg.id && (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`flex justify-between items-center p-2 rounded-md ${
-                    msg.uid === auth.currentUser.uid
-                      ? "bg-blue-200"
-                      : "bg-green-200"
-                  }`}
+          {messages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`message flex justify-between items-center p-2 rounded-md ${
+                msg.uid === auth.currentUser.uid
+                  ? "bg-blue-200"
+                  : "bg-green-200"
+              }`}
+            >
+              <img
+                src={avatarsMap[msg.uid]}
+                alt="User Avatar"
+                className="w-10 h-10 rounded-full"
+              />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(marked(decryptMessage(msg.text))),
+                }}
+              />
+              <div className="flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() =>
+                    updateDoc(doc(db, "messages", msg.id), {
+                      likes: msg.likes.includes(auth.currentUser.uid)
+                        ? arrayRemove(auth.currentUser.uid)
+                        : arrayUnion(auth.currentUser.uid),
+                    })
+                  }
                 >
-                  <img
-                    src={msg.photoURL}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full"
-                  />
-                  {msg.imageUrl ? (
-                    <img
-                      src={msg.imageUrl}
-                      className="w-32 rounded-md"
-                      alt="attachment"
-                    />
-                  ) : (
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(
-                          marked(decryptMessage(msg.text))
-                        ),
-                      }}
-                    />
-                  )}
-                  <div className="flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() =>
-                        updateDoc(doc(db, "messages", msg.id), {
-                          likes: msg.likes.includes(auth.currentUser.uid)
-                            ? arrayRemove(auth.currentUser.uid)
-                            : arrayUnion(auth.currentUser.uid),
-                        })
-                      }
-                    >
-                      ❤️ {msg.likes?.length ?? 0}
-                    </button>
-                    {msg.uid === auth.currentUser.uid && (
-                      <button
-                        onClick={() => deleteDoc(doc(db, "messages", msg.id))}
-                      >
-                        🗑
-                      </button>
-                    )}
-                  </div>
-                </motion.div>
-              )
-          )}
+                  ❤️ {msg.likes?.length ?? 0}
+                </button>
+                {msg.uid === auth.currentUser.uid && (
+                  <button
+                    onClick={() => deleteDoc(doc(db, "messages", msg.id))}
+                  >
+                    🗑
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          ))}
           <div ref={messagesEndRef} />
         </div>
         {isTyping && (
@@ -182,9 +183,7 @@ export default function Chat() {
         )}
         <div className="flex items-center mt-2">
           {showEmojiPicker && (
-            <Picker
-              onEmojiSelect={(emoji) => setInput(input + emoji.unified)}
-            />
+            <Picker onEmojiSelect={(emoji) => setInput(input + emoji.native)} />
           )}
           <input
             value={input}
