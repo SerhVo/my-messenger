@@ -13,10 +13,10 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import { getStorage } from "firebase/storage"; 
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey:  import.meta.env.VITE_API_KEY,
+  apiKey: import.meta.env.VITE_API_KEY,
   authDomain: "my-messenger-f0a59.firebaseapp.com",
   projectId: "my-messenger-f0a59",
   storageBucket: "my-messenger-f0a59.firebasestorage.app",
@@ -33,4 +33,3 @@ export const signInWithGoogle = () => signInWithPopup(auth, provider);
 export const logout = () => signOut(auth);
 export const messagesRef = collection(db, "messages");
 export const storage = getStorage(app); // Инициализация Storage
-

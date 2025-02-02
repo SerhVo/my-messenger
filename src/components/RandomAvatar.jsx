@@ -1,40 +1,33 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const avatars = ["/img/av_bird.jpg", "/img/av_bird2.jpg", "/img/av_cat.jpg"];
 
-const getRandomAvatar = () =>
-  avatars[Math.floor(Math.random() * avatars.length)];
+const getRandomAvatar = () => {
+  const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+  console.log("RandomAvatar:", avatar);
+  return avatar;
+};
 
 export function useUserAvatar(userId, userPhotoURL) {
-  // Загружаем аватары из localStorage при монтировании
-  const [avatarMap, setAvatarMap] = useState(() => {
-    try {
-      const storedAvatars = localStorage.getItem("avatarMap");
-      return storedAvatars ? JSON.parse(storedAvatars) : {};
-    } catch (error) {
-      console.error("Ошибка при загрузке аватаров:", error);
-      return {};
-    }
-  });
+  const [avatar, setAvatar] = useState(userPhotoURL || null);
 
   useEffect(() => {
-    if (!userId || userPhotoURL) return; // Если есть userPhotoURL, используем его
+    if (userPhotoURL) {
+      setAvatar(userPhotoURL);
+      return;
+    }
 
-    setAvatarMap((prevMap) => {
-      if (prevMap[userId]) return prevMap; // Уже есть аватар, ничего не делаем
+    const storedAvatars = JSON.parse(localStorage.getItem("avatarMap") || "{}");
 
+    if (storedAvatars[userId]) {
+      setAvatar(storedAvatars[userId]);
+    } else {
       const newAvatar = getRandomAvatar();
-      const updatedMap = { ...prevMap, [userId]: newAvatar };
+      storedAvatars[userId] = newAvatar;
+      localStorage.setItem("avatarMap", JSON.stringify(storedAvatars));
+      setAvatar(newAvatar);
+    }
+  }, [userId, userPhotoURL]);
 
-      try {
-        localStorage.setItem("avatarMap", JSON.stringify(updatedMap));
-      } catch (error) {
-        console.error("Ошибка при сохранении аватара:", error);
-      }
-
-      return updatedMap;
-    });
-  }, [userId, userPhotoURL]); // Добавляем `userPhotoURL` в зависимости
-
-  return userPhotoURL || avatarMap[userId] || getRandomAvatar();
+  return avatar;
 }
