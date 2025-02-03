@@ -26,23 +26,26 @@ export default function MessageList({ messages, loading, messagesEndRef }) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className={`message flex justify-between items-center p-2 rounded-md ${
+          className={`flex justify-between items-center p-1 mb-1 rounded-md ${
             msg.uid === auth.currentUser.uid ? "bg-blue-200" : "bg-green-200"
           }`}
         >
-          <img
-            src={avatar}
-            alt="User Avatar" // Используем полученный аватар
-            className="w-10 h-10 rounded-full"
-          />
-          <span
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(
-                marked(decryptMessage(msg.text || ""))
-              ),
-            }}
-          />
-          <div className="flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
+          <div className="flex items-center">
+            <img
+              src={msg.imageUrl ? msg.imageUrl : avatar}
+              alt="User Avatar" // Используем полученный аватар
+              className="w-10 h-10 rounded-full mr-5 "
+            />
+            <span
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  marked(decryptMessage(msg.text || ""))
+                ),
+              }}
+            />
+          </div>
+
+          <div className="flex gap-2 opacity-50 hover:opacity-100 transition-opacity">
             <button
               onClick={() =>
                 updateDoc(doc(db, "messages", msg.id), {

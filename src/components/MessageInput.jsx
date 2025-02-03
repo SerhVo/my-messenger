@@ -71,7 +71,7 @@ export default function MessageInput({ messagesEndRef }) {
   };
 
   return (
-    <div className="flex flex-col mt-2">
+    <div className="flex justify-between items-center  mt-2">
       {showEmojiPicker && (
         <Picker onEmojiSelect={(emoji) => setInput(input + emoji.native)} />
       )}
@@ -83,7 +83,7 @@ export default function MessageInput({ messagesEndRef }) {
           setInput(e.target.value);
           handleTyping();
         }}
-        className="w-full p-2 border rounded-md"
+        className="w-full p-1 border rounded-md"
         placeholder="Введите сообщение..."
       />
       <button
@@ -92,14 +92,19 @@ export default function MessageInput({ messagesEndRef }) {
       >
         Отправить
       </button>
-      <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😊</button>
+      <button
+        className="ml-2 cursor-pointer text-3xl"
+        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+      >
+        😊
+      </button>
       <input
         type="file"
         onChange={handleFileUpload}
         className="hidden"
         id="fileUpload"
       />
-      <label htmlFor="fileUpload" className="cursor-pointer">
+      <label htmlFor="fileUpload" className="cursor-pointer ml-2 text-3xl">
         📷
       </label>
     </div>

@@ -43,7 +43,7 @@ useEffect(() => {
 
   return (
     <div className="relative w-full max-w-md p-4 border rounded-md">
-      <div className="absolute inset-0 bg-[url('/fon.png')] bg-contain bg-repeat opacity-10"></div>
+      <div className="absolute inset-0 bg-[url('/img/fon.png')] bg-contain bg-repeat opacity-10"></div>
       <div className="relative z-10">
         <MessageList
           messages={messages || []}

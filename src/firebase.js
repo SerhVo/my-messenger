@@ -5,24 +5,20 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-} from "firebase/firestore";
+import { getFirestore, collection } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
-  authDomain: "my-messenger-f0a59.firebaseapp.com",
-  projectId: "my-messenger-f0a59",
-  storageBucket: "my-messenger-f0a59.firebasestorage.app",
-  messagingSenderId: "526759938419",
-  appId: "1:526759938419:web:e31f5ddc97b96a0a889d06",
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID,
 };
+
+
+console.log("API Key:", import.meta.env.VITE_API_KEY);
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
