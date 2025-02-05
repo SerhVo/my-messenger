@@ -21,7 +21,7 @@ export default function Main() {
       <img
         src="/img/logo.png"
         alt="logo"
-        className="w-20 h-20 p-2 object-fit"
+        className="w-20 h-20 p-2 object-fit "
       />
       <h1 className="text-2xl font-bold">Chat App</h1>
 
@@ -32,13 +32,13 @@ export default function Main() {
               <img
                 src={currentUser.photoURL}
                 alt="User Avatar"
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full transition-transform duration-200 hover:scale-200 hover:z-20"
               />
             ) : (
               <img
                 src="/img/av_bird2.jpg"
                 alt="Default Avatar"
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full transition-transform duration-200 hover:scale-200 hover:z-20"
               />
             )}
             <p className="text-sm text-gray-500 ml-10">

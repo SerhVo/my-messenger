@@ -17,7 +17,7 @@ export default function MessageList({ messages, loading, messagesEndRef }) {
   const [editedText, setEditedText] = useState("");
 
   return (
-    <div className="max-h-dvw overflow-auto border-b">
+    <div className="max-h-dvw overflow-auto border-b ">
       {loading && <p>Загрузка сообщений...</p>}
       {messages.map((msg) => (
         <motion.div
@@ -34,19 +34,20 @@ export default function MessageList({ messages, loading, messagesEndRef }) {
           onMouseLeave={() => setHoveredMessage(null)}
         >
           {/* Верхняя часть: Аватар, имя */}
-          <ul className="flex justify-between items-center w-full">
-            <li className="flex items-center max-w-40 overflow-hidden">
+          <ul className="flex items-center w-full">
+            <li className=" flex-none items-center max-w-40 overflow-hidden">
               <img
                 src={msg.photoURL || "/img/av_cat.jpg"}
                 alt="User Avatar"
-                className="w-6 h-6 rounded-full mr-2"
+                className="w-6 h-6  rounded-full mr-2 absolute transition-transform duration-200 hover:scale-200 hover:z-20"
               />
-              <p className="text-xs font-bold text-blue-900 truncate max-w-[100px]">
+
+              <p className="text-xs font-bold text-blue-900 truncate max-w-[130px] ml-8">
                 {msg.displayName?.slice(0, 120) || "Аноним"}
                 {msg.uid === auth.currentUser?.uid && " (Вы)"}
               </p>
             </li>
-            <li className="text-xs text-gray-500 mr-2">
+            <li className="text-xs text-gray-500 grow ml-2">
               <p>
                 {new Date(msg.createdAt.toDate()).toLocaleString("ru", {
                   year: "numeric",
