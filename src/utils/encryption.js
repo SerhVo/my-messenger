@@ -3,7 +3,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 const SECRET_KEY = import.meta.env.VITE_SECRET_KEY || "fallback_key";
-console.log("🔑 SECRET_KEY:", SECRET_KEY);
+
 export const encryptMessage = (text) => {
   return CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
 };

@@ -1,0 +1,15 @@
+{
+  "emulators": {
+    "dataconnect": {
+      "dataDir": "dataconnect/.dataconnect/pgliteData"
+    }
+  },
+  "dataconnect": {
+    "source": "dataconnect"
+  },
+
+  "hosting": {
+    "site": "my-messenger-c1484-f2fb0",
+    "public": "public"
+  }
+}

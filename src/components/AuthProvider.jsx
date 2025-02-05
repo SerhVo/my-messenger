@@ -1,9 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, logout } from "../firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase"; // Убираем `logout`
 import { signIn, signInAnon, signUp } from "../utils/authFunctions";
 import PropTypes from "prop-types";
- // Import functions
 
 const AuthContext = createContext(null);
 
@@ -18,6 +17,12 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // ✅ Исправленный logout
+const logout = async () => {
+  await signOut(auth); // Используем Firebase auth напрямую
+  setUser(null); // Обновляем состояние после выхода
+};
+
   return (
     <AuthContext.Provider value={{ user, signUp, signIn, signInAnon, logout }}>
       {children}
@@ -26,8 +31,7 @@ export const AuthProvider = ({ children }) => {
 };
 
 AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired, // Ensures children is a valid React node
+  children: PropTypes.node.isRequired,
 };
-
 
 export const useAuth = () => useContext(AuthContext);

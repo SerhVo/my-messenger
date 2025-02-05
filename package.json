@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emoji-mart/react": "^1.1.1",
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@tailwindcss/vite": "^4.0.1",
     "crypto-js": "^4.2.0",
     "dompurify": "^3.2.4",

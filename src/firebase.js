@@ -1,10 +1,5 @@
 import { initializeApp } from "firebase/app";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-} from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore, collection } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -17,15 +12,12 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_APP_ID,
 };
 
-
-console.log("API Key:", import.meta.env.VITE_API_KEY);
-
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const provider = new GoogleAuthProvider();
 
 export const signInWithGoogle = () => signInWithPopup(auth, provider);
-export const logout = () => signOut(auth);
+// export const logout = () => signOut(auth);
 export const messagesRef = collection(db, "messages");
 export const storage = getStorage(app); // Инициализация Storage
