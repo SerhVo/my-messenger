@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { auth, db } from "../firebase";
+import { auth } from "../firebase";
+import { decryptMessage } from "../utils/encryption";
 import {
-  doc,
-  updateDoc,
-  arrayRemove,
-  arrayUnion,
-  deleteDoc,
-} from "firebase/firestore";
+  handleLikeMessage,
+  handleDeleteMessage,
+  handleSaveEdit,
+} from "../utils/messageUtils";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
-import { decryptMessage, encryptMessage } from "../utils/encryption";
 import PropTypes from "prop-types";
 
 export default function MessageList({ messages, loading, messagesEndRef }) {
@@ -18,17 +16,8 @@ export default function MessageList({ messages, loading, messagesEndRef }) {
   const [editingMessage, setEditingMessage] = useState(null);
   const [editedText, setEditedText] = useState("");
 
-  // Функция сохранения отредактированного сообщения
-  const handleSaveEdit = async (msgId) => {
-    if (!editedText.trim()) return;
-    await updateDoc(doc(db, "messages", msgId), {
-      text: encryptMessage(editedText),
-    });
-    setEditingMessage(null);
-  };
-
   return (
-    <div className="h-64 overflow-auto border-b">
+    <div className="max-h-dvw overflow-auto border-b">
       {loading && <p>Загрузка сообщений...</p>}
       {messages.map((msg) => (
         <motion.div
@@ -37,35 +26,44 @@ export default function MessageList({ messages, loading, messagesEndRef }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           className={`relative flex flex-col p-2 mb-1 rounded-md ${
-            msg.uid === auth.currentUser?.uid ? "bg-blue-200" : "bg-green-200"
+            msg.uid === auth.currentUser?.uid
+              ? "bg-blue-100 border"
+              : "bg-green-100 border"
           }`}
           onMouseEnter={() => setHoveredMessage(msg.id)}
           onMouseLeave={() => setHoveredMessage(null)}
         >
           {/* Верхняя часть: Аватар, имя */}
           <ul className="flex justify-between items-center w-full">
-            <li className="flex items-center">
+            <li className="flex items-center max-w-40 overflow-hidden">
               <img
-                src={msg.photoURL}
+                src={msg.photoURL || "/img/av_cat.jpg"}
                 alt="User Avatar"
                 className="w-6 h-6 rounded-full mr-2"
               />
-              <p className="text-xs font-bold text-blue-900">
-                {msg.displayName || "Аноним"}
+              <p className="text-xs font-bold text-blue-900 truncate max-w-[100px]">
+                {msg.displayName?.slice(0, 120) || "Аноним"}
                 {msg.uid === auth.currentUser?.uid && " (Вы)"}
               </p>
             </li>
-            <li className="flex gap-2 opacity-50 hover:opacity-100 transition-opacity">
+            <li className="text-xs text-gray-500 mr-2">
+              <p>
+                {new Date(msg.createdAt.toDate()).toLocaleString("ru", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                })}
+              </p>
+            </li>
+            <li className="flex gap-2 ml-3">
               <button
-                onClick={() =>
-                  updateDoc(doc(db, "messages", msg.id), {
-                    likes: (msg.likes || []).includes(auth.currentUser?.uid)
-                      ? arrayRemove(auth.currentUser.uid)
-                      : arrayUnion(auth.currentUser.uid),
-                  })
-                }
+                onClick={() => handleLikeMessage(msg.id, msg.likes)}
+                className="text-md ml-1"
               >
-                ❤️ {msg.likes?.length ?? 0}
+                {msg.likes?.includes(auth.currentUser?.uid) ? "❤️" : "🤍"}{" "}
+                {msg.likes?.length ?? 0}
               </button>
             </li>
           </ul>
@@ -80,7 +78,9 @@ export default function MessageList({ messages, loading, messagesEndRef }) {
                 className="flex-1 p-1 border rounded-md"
               />
               <button
-                onClick={() => handleSaveEdit(msg.id)}
+                onClick={() =>
+                  handleSaveEdit(msg.id, editedText, setEditingMessage)
+                }
                 className="text-green-600 hover:text-green-800"
               >
                 ✅
@@ -110,7 +110,7 @@ export default function MessageList({ messages, loading, messagesEndRef }) {
                 🖊️
               </button>
               <button
-                onClick={() => deleteDoc(doc(db, "messages", msg.id))}
+                onClick={() => handleDeleteMessage(msg.id)}
                 className="text-gray-600 hover:text-red-600 transition"
               >
                 🗑
