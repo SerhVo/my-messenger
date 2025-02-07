@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://github.com/SerhVo/my-messenger",
+  "homepage": "https://serhvo.github.io/my-messenger/",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
